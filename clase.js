@@ -43,6 +43,7 @@ class ProductManager{
     }
 
     getProductsById(id){
+        this.getProducts();
         const product = this.products.find((p) => p.id === id);
         if(product === undefined){
             console.log(`el producto con id ${id} no existe`);
@@ -62,6 +63,42 @@ class ProductManager{
         const lastProductId = this.products[this.products.length - 1].id;
         console.log("el ultimo id es", lastProductId);
         return lastProductId;
+    }
+
+    updatesProduct(id, productActualizado){
+        this.getProducts();
+        if(this.products.find((producto) => producto.id === id) === undefined){
+            console.error(`el id ${id} no existe`);
+            return;
+        }
+
+        const indice = this.products.findIndex((producto) => producto.id === id);
+        this.products[indice] = {id, ...productActualizado};
+        
+        try {
+            fs.writeFileSync(this.path, JSON.stringify(this.products));
+            console.log("archivo actualizado");
+        } catch (error) {
+            console.error("no se pudo actualizar", error);
+        }
+    }
+
+    deleteProduct(id){
+        this.getProducts();
+        if(this.products.find((producto) => producto.id === id) === undefined){
+            console.error(`el id ${id} no existe`);
+            return;
+        }
+
+        const indice = this.products.findIndex((producto => producto.id === id));
+        this.products.splice(indice,1);
+
+        try {
+            fs.writeFileSync(this.path, JSON.stringify(this.products));
+            console.log("archivo eliminado exitosamente");
+        } catch (error) {
+            console.error("no se pudo eliminar el archivo");
+        }
     }
 
 }
@@ -87,5 +124,23 @@ const product2 ={
 };
 
 productManager.addProduct(product2);
+// const misProductos = productManager.getProducts()
+// console.log(misProductos);
+
+const busqueda = productManager.getProductsById(2)
+console.log(busqueda);
+
+
+const product3 ={
+    title:"title 4",
+    description: "aaaaa",
+    price:"price",
+    thumnail: "thumnail",
+    code:"543",
+    stock: "5",
+};
+
+productManager.updatesProduct(2,product3)
 const misProductos = productManager.getProducts()
 console.log(misProductos);
+
